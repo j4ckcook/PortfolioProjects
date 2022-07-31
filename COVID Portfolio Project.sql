@@ -147,3 +147,38 @@ Create View CountriesInfectionRate as
 SELECT location, population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercentPopulationInfected
 From PortfolioProject..CovidDeaths
 Group by location, population
+
+
+-- Queries for Tableau
+
+-- 1. Find the death percentage of all countries
+
+SELECT SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(new_cases)*100 as DeathPercentage
+FROM PortfolioProject..CovidDeaths
+WHERE continent is not null
+order by 1,2
+
+--2. All the deaths grouped by the location
+
+SELECT location, SUM(cast(new_deaths as int)) as TotalDeathCount
+FROM PortfolioProject..CovidDeaths
+WHERE continent is null
+--Take out world, EU, and international to stay consistent
+and location not in ('World', 'European Union', 'International', 'Upper middle income', 'High income', 'Lower middle income', 'Low income')
+GROUP BY location
+ORDER BY TotalDeathCount desc
+
+
+-- 3. Percentage of country that is infected
+
+SELECT location, Population, MAX(total_cases) as HighestInfectionCount, MAX((Total_cases/population))*100 as PercentPopulationInfected
+FROM PortfolioProject..CovidDeaths
+GROUP BY location, population
+ORDER BY PercentPopulationInfected desc
+
+-- 4. Percentage of country that is infected with date
+
+SELECT location, Population, date, MAX(total_cases) as HighestInfectionCount, MAX((Total_cases/population))*100 as PercentPopulationInfected
+FROM PortfolioProject..CovidDeaths
+GROUP BY location, population, date
+ORDER BY PercentPopulationInfected desc
